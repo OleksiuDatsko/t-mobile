@@ -1,9 +1,16 @@
 from sqlalchemy.orm import Session
 from typing import Type, TypeVar, List
-from data_access.interfaces import IBaseRepository, IOrderRepository, IPaymentRepository, ISubscriberRepository, ITariffRepository
+from data_access.interfaces import (
+    IBaseRepository,
+    IOrderRepository,
+    IPaymentRepository,
+    ISubscriberRepository,
+    ITariffRepository,
+)
 from data_access.models import Order, Payment, Subscriber, TariffPlan
 
 T = TypeVar("T")
+
 
 class BaseRepository(IBaseRepository[T]):
     def __init__(self, session: Session, model: Type[T]):
@@ -29,6 +36,7 @@ class BaseRepository(IBaseRepository[T]):
         self.session.delete(entity)
         self.session.commit()
 
+
 class SubscriberRepository(BaseRepository[Subscriber], ISubscriberRepository):
     def __init__(self, session: Session):
         super().__init__(session, Subscriber)
@@ -42,16 +50,15 @@ class TariffRepository(BaseRepository[TariffPlan], ITariffRepository):
 class OrderRepository(BaseRepository[Order], IOrderRepository):
     def __init__(self, session: Session):
         super().__init__(session, Order)
-        
+
     def add(self, entity):
         order = super().add(entity)
         payment = Payment(order_id=order.id, amount=entity.amount)
         self.session.add(payment)
         self.session.commit()
-        return (entity, payment) 
+        return (entity, payment)
 
 
 class PaymentRepository(BaseRepository[Payment], IPaymentRepository):
     def __init__(self, session: Session):
         super().__init__(session, Payment)
-

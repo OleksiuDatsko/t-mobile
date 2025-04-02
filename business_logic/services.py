@@ -1,8 +1,26 @@
-from data_access.interfaces import ISubscriberRepository, ITariffRepository, IOrderRepository, IPaymentRepository
+from business_logic.interfaces import (
+    IOrderService,
+    IPaymentService,
+    ISubscriberService,
+    ITariffService,
+)
+from data_access.interfaces import (
+    ISubscriberRepository,
+    ITariffRepository,
+    IOrderRepository,
+    IPaymentRepository,
+)
 from data_access.models import Subscriber, TariffPlan, Order, Payment
 
-class SubscriberService:
-    def __init__(self, subscriber_repo: ISubscriberRepository, order_repo: IOrderRepository, payment_repo: IPaymentRepository, tariff_repo: ITariffRepository):
+
+class SubscriberService(ISubscriberService):
+    def __init__(
+        self,
+        subscriber_repo: ISubscriberRepository,
+        order_repo: IOrderRepository,
+        payment_repo: IPaymentRepository,
+        tariff_repo: ITariffRepository,
+    ):
         self.subscriber_repo = subscriber_repo
         self.order_repo = order_repo
         self.payment_repo = payment_repo
@@ -10,7 +28,7 @@ class SubscriberService:
 
     def get_subscriber(self, subscriber_id: int) -> Subscriber | None:
         return self.subscriber_repo.get_by_id(subscriber_id)
-      
+
     def create_subscriber(self, name: str, tariff_plan_id: int) -> Subscriber:
         new_subscriber = Subscriber(name=name, tariff_plan_id=tariff_plan_id)
         return self.subscriber_repo.add(new_subscriber)
@@ -24,9 +42,9 @@ class SubscriberService:
         self.subscriber_repo.update(subscriber)
         return subscriber
 
-        
-    
-    def change_tariff(self, subscriber_id: int, new_tariff_plan_id: int) -> tuple[Order, Payment]:
+    def change_tariff(
+        self, subscriber_id: int, new_tariff_plan_id: int
+    ) -> tuple[Order, Payment]:
         subscriber = self.subscriber_repo.get_by_id(subscriber_id)
         if not subscriber:
             raise ValueError("Subscriber not found")
@@ -34,7 +52,7 @@ class SubscriberService:
         new_tariff_plan = self.tariff_repo.get_by_id(new_tariff_plan_id)
         if not new_tariff_plan:
             raise ValueError("New tariff plan not found")
-          
+
         if new_tariff_plan_id == subscriber.tariff_plan_id:
             raise ValueError("The subscriber is already on this tariff plan")
 
@@ -42,18 +60,19 @@ class SubscriberService:
             subscriber_id=subscriber_id,
             type="change_tariff",
             amount=new_tariff_plan.price,
-            tariff_plan_id=new_tariff_plan_id
+            tariff_plan_id=new_tariff_plan_id,
         )
-        
+
         return self.order_repo.add(order)
 
-class TariffService:
+
+class TariffService(ITariffService):
     def __init__(self, tariff_repo: ITariffRepository):
         self.tariff_repo = tariff_repo
 
     def get_tariff(self, tariff_id: int) -> TariffPlan | None:
         return self.tariff_repo.get_by_id(tariff_id)
-      
+
     def get_all_tariffs(self) -> list[TariffPlan]:
         return self.tariff_repo.get_all()
 
@@ -61,7 +80,9 @@ class TariffService:
         new_tariff = TariffPlan(name=name, price=price)
         return self.tariff_repo.add(new_tariff)
 
-    def update_tariff(self, tariff_id: int, name: str | None = None, price: float | None = None):
+    def update_tariff(
+        self, tariff_id: int, name: str | None = None, price: float | None = None
+    ):
         tariff = self.tariff_repo.get_by_id(tariff_id)
         if not tariff:
             raise ValueError("Tariff plan not found")
@@ -76,28 +97,39 @@ class TariffService:
     def delete_tariff(self, tariff_id: int) -> bool:
         return self.tariff_repo.delete(tariff_id)
 
-class OrderService:
-    def __init__(self, order_repo: IOrderRepository, payment_repo: IPaymentRepository, subscriber_repo: ISubscriberRepository):
+
+class OrderService(IOrderService):
+    def __init__(
+        self,
+        order_repo: IOrderRepository,
+        payment_repo: IPaymentRepository,
+        subscriber_repo: ISubscriberRepository,
+    ):
         self.order_repo = order_repo
         self.payment_repo = payment_repo
         self.subscriber_repo = subscriber_repo
-      
+
     def get_subscriber_orders(self, subscriber_id: int) -> list[Order]:
-        return self.order_repo.get_by_subscriber_id(subscriber_id)  
+        return self.order_repo.get_by_subscriber_id(subscriber_id)
 
 
-class PaymentService:
-    def __init__(self, payment_repo: IPaymentRepository, subscriber_repo: ISubscriberRepository, order_repo: IOrderRepository, tariff_repo: ITariffRepository):
+class PaymentService(IPaymentService):
+    def __init__(
+        self,
+        payment_repo: IPaymentRepository,
+        subscriber_repo: ISubscriberRepository,
+        order_repo: IOrderRepository,
+        tariff_repo: ITariffRepository,
+    ):
         self.payment_repo = payment_repo
         self.subscriber_repo = subscriber_repo
         self.order_repo = order_repo
         self.tariff_repo = tariff_repo
-      
+
     def get_subscriber_payment(self, subscriber_id: int) -> list[Payment]:
         return self.payment_repo.get_by_subscriber_id(subscriber_id)
-    
 
-    def pay(self, payment_id: int):
+    def pay(self, payment_id: int) -> Payment:
         payment = self.payment_repo.get_by_id(payment_id)
         if not payment:
             raise ValueError("Payment not found")
@@ -126,4 +158,3 @@ class PaymentService:
         self.subscriber_repo.update(subscriber)
 
         return payment
-
