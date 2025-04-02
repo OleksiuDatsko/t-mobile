@@ -20,18 +20,23 @@ def load_data_from_csv():
                     name=row["tariff_plan_name"], price=row["tariff_plan_price"]
                 )
                 tariff_plan = tariff_repo.add(tariff_plan)
-
-            subscriber = Subscriber(
-                name=row["subscriber_name"],
-                balance=row["subscriber_balance"],
-                tariff_plan_id=tariff_plan.id,
-            )
-            subscriber_repo.add(subscriber)
+            
+            subscriber = subscriber_repo.get_all(phone_number=row["subscriber_phone_number"])
+            if not subscriber:
+                subscriber = Subscriber(
+                    name=row["subscriber_name"],
+                    balance=row["subscriber_balance"],
+                    phone_number=row["subscriber_phone_number"],
+                    tariff_plan_id=tariff_plan.id,
+                )
+                subscriber_repo.add(subscriber)
+            else:
+                subscriber = subscriber[0]
 
             order = Order(
                 subscriber_id=subscriber.id,
-                type=row["order_type"],
                 amount=row["order_amount"],
+                tariff_plan_id=row["tariff_plan_id"],
             )
             order_repo.add(order)
 

@@ -5,19 +5,19 @@ from data_access.models import Order, Payment, Subscriber, TariffPlan
 
 class ISubscriberService(ABC):
     @abstractmethod
-    def get_subscriber(self, subscriber_id) -> Subscriber | None:
+    def get_subscriber(self, subscriber_id: str) -> Subscriber | None:
         pass
 
     @abstractmethod
-    def create_subscriber(self, name, tariff_plan_id) -> Subscriber:
+    def create_subscriber(self, name: str, tariff_plan_id: int, phone_number: str) -> Subscriber:
         pass
 
     @abstractmethod
-    def update_balance(self, subscriber_id, amount) -> Subscriber:
+    def update_balance(self, subscriber_id: int, amount: float) -> Subscriber:
         pass
 
     @abstractmethod
-    def change_tariff(self, subscriber_id, new_tariff_id) -> tuple[Order, Payment]:
+    def change_tariff(self, subscriber_id: int, new_tariff_plan_id: int) -> tuple[Order, Payment]:
         pass
 
 
@@ -52,10 +52,6 @@ class IOrderService(ABC):
 
 
 class IPaymentService(ABC):
-    @abstractmethod
-    def get_subscriber_payment(self, subscriber_id: int) -> list[Payment]:
-        pass
-
     @abstractmethod
     def pay(self, payment_id: int) -> Payment:
         pass

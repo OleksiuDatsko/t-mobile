@@ -11,16 +11,17 @@ class Subscriber(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     balance = Column(Float, default=0.0)
+    phone_number = Column(String, nullable=True)
     tariff_plan_id = Column(Integer, ForeignKey("tariff_plans.id"))
 
     tariff_plan = relationship("TariffPlan")
 
     def __repr__(self):
 
-        return f"Subscriber(id={self.id}, name='{self.name}', balance={self.balance}, tariff_plan={self.tariff_plan})"
+        return f"Subscriber(id={self.id}, name='{self.name}', balance={self.balance}, phone_number={self.phone_number}, tariff_plan={self.tariff_plan})"
 
     def __str__(self):
-        return f"Subscriber(id={self.id}, name='{self.name}', balance={self.balance}, tariff_plan={self.tariff_plan})"
+        return f"Subscriber(id={self.id}, name='{self.name}', balance={self.balance}, phone_number={self.phone_number}, tariff_plan={self.tariff_plan})"
 
 
 class TariffPlan(Base):
@@ -42,7 +43,6 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     subscriber_id = Column(Integer, ForeignKey("subscribers.id"))
-    type = Column(String, nullable=False)
     amount = Column(Float, nullable=True)
     tariff_plan_id = Column(Integer, ForeignKey("tariff_plans.id"), nullable=True)
 
@@ -50,10 +50,10 @@ class Order(Base):
     tariff_plan = relationship("TariffPlan")
 
     def __repr__(self):
-        return f"Order(id={self.id}, subscriber_id={self.subscriber_id}, type='{self.type}', amount={self.amount})"
+        return f"Order(id={self.id}, subscriber_id={self.subscriber_id}, amount={self.amount})"
 
     def __str__(self):
-        return f"Order(id={self.id}, subscriber_id={self.subscriber_id}, type='{self.type}', amount={self.amount})"
+        return f"Order(id={self.id}, subscriber_id={self.subscriber_id}, amount={self.amount})"
 
 
 class Payment(Base):
@@ -67,7 +67,7 @@ class Payment(Base):
     order = relationship("Order")
 
     def __repr__(self):
-        return f"Payment(id={self.id}, order_id={self.order_id}, amount={self.amount}, status='{self.status}')"
+        return f"Payment(id={self.id}, order_id={self.order_id}, amount={self.amount}, status='{self.status}, order={self.order}')"
 
     def __str__(self):
-        return f"Payment(id={self.id}, order_id={self.order_id}, amount={self.amount}, status='{self.status}')"
+        return f"Payment(id={self.id}, order_id={self.order_id}, amount={self.amount}, status='{self.status}, order={self.order}')"

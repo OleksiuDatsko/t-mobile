@@ -29,8 +29,8 @@ class SubscriberService(ISubscriberService):
     def get_subscriber(self, subscriber_id: int) -> Subscriber | None:
         return self.subscriber_repo.get_by_id(subscriber_id)
 
-    def create_subscriber(self, name: str, tariff_plan_id: int) -> Subscriber:
-        new_subscriber = Subscriber(name=name, tariff_plan_id=tariff_plan_id)
+    def create_subscriber(self, name: str, tariff_plan_id: int, phone_number: str) -> Subscriber:
+        new_subscriber = Subscriber(name=name, tariff_plan_id=tariff_plan_id, phone_number=phone_number)
         return self.subscriber_repo.add(new_subscriber)
 
     def update_balance(self, subscriber_id: int, amount: float) -> Subscriber:
@@ -42,9 +42,7 @@ class SubscriberService(ISubscriberService):
         self.subscriber_repo.update(subscriber)
         return subscriber
 
-    def change_tariff(
-        self, subscriber_id: int, new_tariff_plan_id: int
-    ) -> tuple[Order, Payment]:
+    def change_tariff(self, subscriber_id: int, new_tariff_plan_id: int) -> tuple[Order, Payment]:
         subscriber = self.subscriber_repo.get_by_id(subscriber_id)
         if not subscriber:
             raise ValueError("Subscriber not found")
@@ -58,12 +56,14 @@ class SubscriberService(ISubscriberService):
 
         order = Order(
             subscriber_id=subscriber_id,
-            type="change_tariff",
             amount=new_tariff_plan.price,
             tariff_plan_id=new_tariff_plan_id,
         )
+        self.order_repo.add(order)
 
-        return self.order_repo.add(order)
+        payment = Payment(order_id=order.id, amount=order.amount, status="pending")
+        self.payment_repo.add(payment)
+        return order, payment
 
 
 class TariffService(ITariffService):
@@ -110,7 +110,7 @@ class OrderService(IOrderService):
         self.subscriber_repo = subscriber_repo
 
     def get_subscriber_orders(self, subscriber_id: int) -> list[Order]:
-        return self.order_repo.get_by_subscriber_id(subscriber_id)
+        return self.order_repo.get_all(subscriber_id=subscriber_id)
 
 
 class PaymentService(IPaymentService):
@@ -125,9 +125,6 @@ class PaymentService(IPaymentService):
         self.subscriber_repo = subscriber_repo
         self.order_repo = order_repo
         self.tariff_repo = tariff_repo
-
-    def get_subscriber_payment(self, subscriber_id: int) -> list[Payment]:
-        return self.payment_repo.get_by_subscriber_id(subscriber_id)
 
     def pay(self, payment_id: int) -> Payment:
         payment = self.payment_repo.get_by_id(payment_id)
@@ -148,11 +145,10 @@ class PaymentService(IPaymentService):
         subscriber.balance -= payment.amount
         payment.status = "completed"
 
-        if order.type == "change_tariff" and order.tariff_plan_id:
-            tariff_plan = self.tariff_repo.get_by_id(order.tariff_plan_id)
-            if not tariff_plan:
-                raise ValueError("The specified tariff plan does not exist")
-            subscriber.tariff_plan_id = order.tariff_plan_id
+        tariff_plan = self.tariff_repo.get_by_id(order.tariff_plan_id)
+        if not tariff_plan:
+            raise ValueError("The specified tariff plan does not exist")
+        subscriber.tariff_plan_id = order.tariff_plan_id
 
         self.payment_repo.update(payment)
         self.subscriber_repo.update(subscriber)

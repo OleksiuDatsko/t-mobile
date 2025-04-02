@@ -25,8 +25,11 @@ class BaseRepository(IBaseRepository[T]):
     def get_by_id(self, entity_id: int) -> T | None:
         return self.session.query(self.model).filter_by(id=entity_id).first()
 
-    def get_all(self) -> List[T]:
-        return self.session.query(self.model).all()
+    def get_all(self, **kwargs) -> List[T]:
+        query = self.session.query(self.model)
+        for key, value in kwargs.items():
+            query = query.filter(getattr(self.model, key) == value)
+        return query.all()
 
     def update(self, entity: T) -> T:
         self.session.commit()
@@ -50,13 +53,6 @@ class TariffRepository(BaseRepository[TariffPlan], ITariffRepository):
 class OrderRepository(BaseRepository[Order], IOrderRepository):
     def __init__(self, session: Session):
         super().__init__(session, Order)
-
-    def add(self, entity):
-        order = super().add(entity)
-        payment = Payment(order_id=order.id, amount=entity.amount)
-        self.session.add(payment)
-        self.session.commit()
-        return (entity, payment)
 
 
 class PaymentRepository(BaseRepository[Payment], IPaymentRepository):
