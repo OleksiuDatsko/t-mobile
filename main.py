@@ -6,12 +6,13 @@ def main():
     order_service = container.order_service
     payment_service = container.payment_service
 
-    print(subscriber_service.get_subscriber(1))
+    print(subscriber := subscriber_service.get_subscriber(1))
     print(subscriber_service.update_balance(1, 100.0))
     print(order_service.get_subscriber_orders(1))
 
-    _, payment = subscriber_service.change_tariff(1, 2)
-    print(payment)
+    new_tarif_id = 0 if subscriber.tariff_plan.id + 1 > 3 else subscriber.tariff_plan.id + 1
+    order, payment = subscriber_service.change_tariff(1, new_tarif_id)
+    print(order, payment)
     print(payment_service.pay(payment.id))
     print(subscriber_service.get_subscriber(1))
 
