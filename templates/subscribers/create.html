@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Додати абонента</title>
+  <style>
+    body { font-family: Arial; margin: 2em; }
+    label { display: block; margin: 0.5em 0 0.2em; }
+    input, select { padding: 5px; width: 300px; }
+    button { margin-top: 1em; padding: 8px 16px; background: green; color: white; border: none; }
+  </style>
+</head>
+<body>
+  <h2>Додати нового абонента</h2>
+  <form method="POST">
+    <label>Ім'я:</label>
+    <input name="name" required>
+
+    <label>Номер телефону:</label>
+    <input name="phone_number" required>
+
+    <label>Тарифний план:</label>
+    <select name="tariff_plan_id">
+      {% for tariff in tariffs %}
+        <option value="{{ tariff.id }}">{{ tariff.name }} ({{ tariff.price }} грн)</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit">Зберегти</button>
+  </form>
+  <p><a href="{{ url_for('subscriber_bp.index') }}">← Назад</a></p>
+</body>
+</html>
