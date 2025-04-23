@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Видалити абонента</title>
-  <style>
-    body { font-family: Arial; margin: 2em; }
-    .danger { background: crimson; color: white; padding: 10px 20px; border: none; }
-  </style>
-</head>
-<body>
-  <h2>Видалити абонента</h2>
-  <p>Ви впевнені, що хочете видалити абонента <strong>{{ subscriber.name }}</strong> ({{ subscriber.phone_number }})?</p>
-  <form method="POST">
-    <button class="danger" type="submit">Так, видалити</button>
-  </form>
-  <p><a href="{{ url_for('subscriber_bp.index') }}">← Назад</a></p>
-</body>
+  <head>
+    <title>Видалити абонента</title>
+    <style>
+      body {
+        font-family: Arial;
+        margin: 2em;
+      }
+      button {
+        padding: 6px 12px;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        background: red;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Видалити абонента</h2>
+    <p>
+      Ви впевнені, що хочете видалити абонента
+      <strong>{{ subscriber.name }}</strong> ({{ subscriber.phone_number }})?
+    </p>
+    <form method="POST">
+      <button type="submit">Так, видалити</button>
+    </form>
+    <p><a href="{{ url_for('subscriber_bp.index') }}">← Назад</a></p>
+  </body>
 </html>

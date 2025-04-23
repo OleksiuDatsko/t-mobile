@@ -1,34 +1,55 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Редагувати абонента</title>
-  <style>
-    body { font-family: Arial; margin: 2em; }
-    label { display: block; margin: 0.5em 0 0.2em; }
-    input, select { padding: 5px; width: 300px; }
-    button { margin-top: 1em; padding: 8px 16px; background: dodgerblue; color: white; border: none; }
-  </style>
-</head>
-<body>
-  <h2>Редагувати абонента</h2>
-  <form method="POST">
-    <label>Ім'я:</label>
-    <input name="name" value="{{ subscriber.name }}" required>
+  <head>
+    <title>Редагувати абонента</title>
+    <style>
+      body {
+        font-family: Arial;
+        margin: 2em;
+      }
+      label {
+        display: block;
+        margin: 0.5em 0 0.2em;
+      }
+      input,
+      select {
+        padding: 5px;
+        width: 300px;
+      }
+      button {
+        padding: 6px 12px;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        background: #2196f3;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Редагувати абонента</h2>
+    <form method="POST">
+      <label>Ім'я:</label>
+      <input name="name" value="{{ subscriber.name }}" required />
 
-    <label>Номер телефону:</label>
-    <input name="phone_number" value="{{ subscriber.phone_number }}" required>
+      <label>Номер телефону:</label>
+      <input
+        name="phone_number"
+        value="{{ subscriber.phone_number }}"
+        required
+      />
 
-    <label>Тарифний план:</label>
-    <select name="tariff_plan_id">
+      <label>Тарифний план:</label>
+      <select name="tariff_plan_id">
       {% for tariff in tariffs %}
-        <option value="{{ tariff.id }}" {% if tariff.id == subscriber.tariff_plan_id %}selected{% endif %}>
+        <option value="{{ tariff.id }}" {% if tariff.id == subscriber.tariff_plan_id %}selected{% endif %} >
           {{ tariff.name }} ({{ tariff.price }} грн)
         </option>
       {% endfor %}
     </select>
 
-    <button type="submit">Оновити</button>
-  </form>
-  <p><a href="{{ url_for('subscriber_bp.index') }}">← Назад</a></p>
-</body>
+      <button type="submit">Оновити</button>
+    </form>
+    <p><a href="{{ url_for('subscriber_bp.index') }}">← Назад</a></p>
+  </body>
 </html>

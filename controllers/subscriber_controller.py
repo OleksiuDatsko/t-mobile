@@ -24,7 +24,7 @@ def create():
     return render_template("subscribers/create.html", tariffs=tariffs)
 
 
-@subscriber_bp.route("/edit/<int:id>", methods=["GET", "POST"])
+@subscriber_bp.route("/<int:id>/edit", methods=["GET", "POST"])
 def edit(id):
     subscriber = subscriber_service.get_subscriber(id)
     if request.method == "POST":
@@ -37,7 +37,7 @@ def edit(id):
     return render_template("subscribers/edit.html", subscriber=subscriber, tariffs=tariffs)
 
 
-@subscriber_bp.route("/delete/<int:id>", methods=["GET", "POST"])
+@subscriber_bp.route("/<int:id>/delete", methods=["GET", "POST"])
 def delete(id):
     subscriber = subscriber_service.get_subscriber(id)
     if request.method == "POST":
