@@ -8,7 +8,7 @@ tariff_service = container.tariff_service
 
 @subscriber_bp.route("/")
 def index():
-    subscribers = container.subscriber_repo.get_all()
+    subscribers = container.subscriber_service.get_all_subscribers()
     return render_template("subscribers/index.html", subscribers=subscribers)
 
 

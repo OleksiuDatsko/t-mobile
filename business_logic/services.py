@@ -25,6 +25,9 @@ class SubscriberService(ISubscriberService):
         self.order_repo = order_repo
         self.payment_repo = payment_repo
         self.tariff_repo = tariff_repo
+        
+    def get_all_subscribers(self) -> list[Subscriber]:
+        return self.subscriber_repo.get_all()
 
     def get_subscriber(self, subscriber_id: int) -> Subscriber | None:
         return self.subscriber_repo.get_by_id(subscriber_id)

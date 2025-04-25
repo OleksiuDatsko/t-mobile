@@ -5,6 +5,10 @@ from data_access.models import Order, Payment, Subscriber, TariffPlan
 
 class ISubscriberService(ABC):
     @abstractmethod
+    def get_all_subscribers(self) -> list[Subscriber]:
+        pass
+    
+    @abstractmethod
     def get_subscriber(self, subscriber_id: str) -> Subscriber | None:
         pass
 
